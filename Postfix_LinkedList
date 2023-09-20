@@ -1,0 +1,471 @@
+#include<iostream>
+#include<string>
+#include<cstring>
+using namespace std;
+
+
+int const c = 200;
+int top = -1;
+int siz = 0;
+
+
+
+class Node {
+public:
+	string data;
+	Node* next;
+};
+Node* topOfMain;
+Node* MultPoly;
+
+
+
+
+
+
+
+void push(string new_data) {
+
+		if (top >= c - 1) {
+			cout << "stack overflow" << endl;
+		}
+		else {
+			top++;
+
+			Node* new_node = new Node();
+
+			new_node->data = new_data;
+
+			new_node->next = topOfMain;
+
+			topOfMain = new_node;
+
+
+	    }
+
+}
+
+
+
+
+void pop() {
+		if (top == -1) {
+			cout << "stack  main underflow" << endl;
+		}
+		else {
+			top--;
+			cout << "YOu Poped :" << topOfMain->data << endl;
+			Node* temp;
+			temp = topOfMain;
+			topOfMain = topOfMain->next;
+
+			temp->next = NULL;
+
+			free(temp);
+
+		}
+}
+
+
+
+
+
+void Display() {
+
+		Node* temp;
+		temp = topOfMain;
+		while (temp != NULL)
+		{
+			cout << temp->data << "-> ";
+
+			temp = temp->next;
+		}
+
+}
+
+int first(string d) {
+	if (d == "*" || d == "/") {
+		return 3;
+	}
+	if (d == "+" || d == "-") {
+		return 2;
+	}
+}
+
+Node* postfix(Node* e) {
+
+	Node* y = NULL;
+	Node* mid = NULL;
+	Node* Sta = NULL;
+	Sta = new Node();
+	mid = new Node();
+	y = new Node();
+
+
+	char g[1];
+
+	int sign;
+	for (int i = 0; i < e->data.size(); i++)
+	{
+		if (int(e->data[i]) > 47) {
+			y->data += e->data[i];
+		}
+
+
+		if (int(e->data[i]) <= 47 && int(e->data[i]) > 41) {
+			mid->data = e->data[i];
+
+
+
+			if (top == -1) {
+				push(mid->data);
+			}
+			else {
+				
+				if (first(topOfMain->data) < first(mid->data) && topOfMain->data != "(") {
+					push(mid->data);
+				}
+
+
+				if (topOfMain->data == "(") {
+					push(mid->data);
+				}
+				else if (first(mid->data) >= first(topOfMain->data) && topOfMain->data != "(") {
+					while (top != -1) {
+
+						y->data += topOfMain->data;
+						pop();
+						if (first(topOfMain->data) < first(mid->data)) {
+							break;
+						}
+					}
+					mid->data = e->data[i];
+					push(mid->data);
+				}
+				sign = i;
+			}
+		}
+
+
+
+		if (e->data[i] == '(') {
+			push("(");
+		}
+		else if (e->data[i] == ')') {
+			for (int k = i - 1; k >= 0; k--) {
+				if (top == -1) {
+					break;
+				}
+				if (e->data[k] == '(') {
+					break;
+				}
+				if (topOfMain->data != "(") {
+					y->data += topOfMain->data;
+					pop();
+				}
+				if (topOfMain->data == "(") {
+					pop();
+					break;
+				}
+			}
+		}
+	}
+
+	for (int i = top; i >= 0; i--)
+	{
+		if (topOfMain->data != "(") {
+			y->data += topOfMain->data;
+			pop();
+		}
+		if (topOfMain->data == "(") {
+			pop();
+		}
+	}
+	return y;
+
+}
+
+Node* SubDev(Node* Polynomial) {
+	Node* mid1;
+	mid1= new Node();
+		Node* mid2;
+		mid2= new Node();
+     Node *Result=NULL;
+	 Result = new Node();
+
+
+	int  bracket = 0, bracket2 = 0, NUm,NumSize=0;
+	siz = Polynomial->data.size();
+	for (int i = 0; i < Polynomial->data.size(); i++) {
+		if (Polynomial->data[i] == '*' || Polynomial->data[i] == '/') {
+			siz += 2;
+		}
+
+	}
+
+	int signl = -1, signm = -1;
+	for (int i = 0; i < siz; i++)
+	{
+		if (i > siz) {
+			break;
+		}
+		if (Polynomial->data[i] == '*' || Polynomial->data[i] == '/') {
+
+			NUm = 0;
+			//cout << "i" << i <<e->datandl;
+			Result->data = "", mid1->data = "", mid2->data = "";
+
+			for (int j = i - 1; j >= 0; j--)
+			{
+
+				if (int(Polynomial->data[j]) <= 47 && int(Polynomial->data[j]) > 41) {
+					signl = j;
+					break;
+				}
+				if (int(Polynomial->data[j]) == 41) {
+					NUm = 1;
+					//bracket++;
+
+
+					for (int k = j; k >= 0; k--) {
+						if (int(Polynomial->data[k]) == 41)
+						{
+							bracket++;
+						}
+
+						if (int(Polynomial->data[k]) == 40) {
+							break;
+						}
+
+						Result->data = Polynomial->data[k] + Result->data;
+					}
+					break;
+				}
+				Result->data = Polynomial->data[j] + Result->data;
+			}
+
+
+
+			Result->data += Polynomial->data[i];
+
+
+	
+			for (int j = i + 1; j < Polynomial->data.size(); j++)
+			{
+
+				if (int(Polynomial->data[j]) <= 47) {
+					signm = j;
+					break;
+				}
+				else {
+					signm = siz + 44;
+				}
+
+
+				Result->data += Polynomial->data[j];
+
+
+			}
+
+
+			for (int i = 0; i <= signl; i++)
+			{
+				mid1->data += Polynomial->data[i];
+			}
+
+
+			for (int i = signm; i < Polynomial->data.size(); i++)
+			{
+
+				mid2->data += Polynomial->data[i];
+
+			}
+
+
+			Result->data += ")";
+
+			if (NUm == 1) {
+				for (int i = 0; i < bracket; i++)
+				{
+					Result->data = "(" + Result->data;
+				}
+			}
+			bracket = 0;
+
+			Result->data = "(" + Result->data;
+
+			Polynomial->data = mid1->data + Result->data + mid2->data;
+
+			i += 2;
+		}
+	}
+
+	return Polynomial;
+}
+Node* Add(Node* Polynomial) {
+
+	Node* mid1 = NULL;
+		Node* mid2 = NULL;
+		Node* Result=NULL;
+
+		mid1 = new Node();
+	
+		mid2 = new Node();
+	
+		Result = new Node();
+
+	int signl = -1, signm = -1, bracket = 0, bracket2 = 0;
+	int Bigsign = 0;
+	for (int i = 0; i < Polynomial->data.size(); i++) {
+		if (Polynomial->data[i] == '+' || Polynomial->data[i] == '-') {
+			siz += 2;
+		}
+	}
+
+	for (int i = 0; i < siz; i++)
+	{
+		if (Polynomial->data[i] == '+' || Polynomial->data[i] == '-') {
+
+			Result->data = "", mid1->data = "", mid2->data = "";
+
+
+			for (int j = i - 1; j >= 0; j--)
+			{
+
+				if (int(Polynomial->data[j]) <= 47 && int(Polynomial->data[j]) > 41) {
+					signl = j;
+					break;
+				}
+				if (int(Polynomial->data[j]) == 41) {
+
+					for (int k = j; k >= 0; k--) {
+
+						if (int(Polynomial->data[k]) == 41)
+						{
+							bracket2++;
+						}
+
+						Result->data = Polynomial->data[k] + Result->data;
+						if (int(Polynomial->data[k]) == 40) {
+							Bigsign++;
+						}
+						if (Bigsign == bracket2) {
+							break;
+						}
+				
+					}
+					break;
+				}
+				Result->data = Polynomial->data[j] + Result->data;
+			}
+
+
+			Result->data += Polynomial->data[i];
+
+			Bigsign = 0, bracket2 = 0;
+
+			for (int j = i + 1; j < Polynomial->data.size(); j++)
+			{
+
+				if (int(Polynomial->data[j]) <= 47 && int(Polynomial->data[j]) > 41) {
+					signm = j;
+					break;
+				}
+				if (int(Polynomial->data[j]) == 40) {
+
+					for (int k = j; k < siz; k++)
+					{
+
+						if (int(Polynomial->data[k]) == 40)
+						{
+							bracket2++;
+
+						}
+
+						if (int(Polynomial->data[k]) == 41) {
+							Bigsign++;
+							signm = k;
+						}
+
+						if (Bigsign == bracket2) {
+							break;
+						}
+						Result->data = Result->data + Polynomial->data[k];
+					}
+					break;
+				}
+				else {
+					if (int(Polynomial->data[j]) <= 47) {
+						signm = j;
+						break;
+					}
+					else {
+						signm = siz + 44;
+					}
+					Result->data += Polynomial->data[j];
+
+				}
+			}
+			for (int i = 0; i <= signl; i++)
+			{
+				mid1->data += Polynomial->data[i];
+			}
+
+
+
+			for (int i = signm; i < Polynomial->data.size(); i++)
+			{
+
+				mid2->data += Polynomial->data[i];
+			}
+
+			Result->data = Result->data + ")";
+			bracket = 0;
+			Result->data = "(" + Result->data;
+			Polynomial->data = mid1->data + Result->data + mid2->data;
+
+			i += 2;
+		}
+	}
+
+	return Polynomial;
+}
+
+int main()
+{
+	Node* Poly=NULL;
+	Poly = new Node();
+	
+	Node* polFinal=NULL;
+	polFinal = new Node();
+
+	Node* Result=NULL;
+
+	Result=new Node();
+	string Polynomial;
+	cin >> Polynomial;
+
+	Poly->data = Polynomial;
+
+
+	polFinal->data = Polynomial;
+	cout << "Answer:" << endl;
+	polFinal = Add(SubDev(Poly));
+	cout << polFinal->data << endl;
+
+
+	cout << "*********** para" << endl;
+	cout << postfix(Poly)->data << endl;
+	cout << "*************" << endl << postfix(polFinal)->data << endl;
+
+
+	if (postfix(polFinal)->data == postfix(Poly)->data) {
+		Result->data = "True";
+	}
+	else {
+		Result->data = "False";
+	}
+	cout << Result->data;
+
+	return 0;
+}
